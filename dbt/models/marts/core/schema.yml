@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: dim_products
+    description: "Dimension table for products with their categories"
+    columns:
+      - name: product_id
+        description: "Unique product identifier (ASIN)"
+        tests:
+          - not_null
+          - unique
+          - relationships:
+              to: ref('fact_reviews')
+              field: product_id
+      - name: parent_asin
+        description: "Parent product ASIN if this is a variation"
+      - name: product_category
+        description: "Category of the product"
+        tests:
+          - accepted_values:
+              values: ['subscription_boxes', 'gift_cards', 'digital_music']
+
+  - name: fact_reviews
+    description: "Fact table containing all review data with metrics"
+    columns:
+      - name: review_id
+        description: "Unique identifier for the review"
+        tests:
+          - not_null
+          - unique
+      - name: overall_rating
+        description: "Rating from 1 to 5 stars"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1
+              max_value: 5
+      - name: sentiment
+        description: "Categorical sentiment (positive, neutral, negative)"
+        tests:
+          - accepted_values:
+              values: ['positive', 'neutral', 'negative']

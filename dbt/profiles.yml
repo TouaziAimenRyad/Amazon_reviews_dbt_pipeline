@@ -1,0 +1,12 @@
+amazon_reviews:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      user: don
+      password: donza3im
+      port: 5432
+      dbname: postgres_wearhouse
+      schema: data_wearhouse
+      threads: 4

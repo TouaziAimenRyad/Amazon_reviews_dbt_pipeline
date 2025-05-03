@@ -1,0 +1,67 @@
+version: 2
+
+sources:
+  - name: amazon_raw
+    database: postgres_wearhouse
+    schema: data_wearhouse
+    tables:
+      - name: subscription_boxes
+        description: "Raw subscription boxes reviews from Amazon"
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 1, period: day}
+          error_after: {count: 2, period: day}
+        columns:
+          - name: review_id
+            description: "Unique identifier for the review"
+            tests:
+              - not_null
+              - unique
+          - name: asin
+            description: "Amazon Standard Identification Number for the product"
+          - name: overall_rating
+            description: "Rating given by the reviewer (1-5 stars)"
+            tests:
+              - dbt_expectations.expect_column_values_to_be_between:
+                  min_value: 1
+                  max_value: 5
+      - name: gift_cards
+        description: "Raw gift cards reviews from Amazon"
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 1, period: day}
+          error_after: {count: 2, period: day}
+        columns:
+          - name: review_id
+            description: "Unique identifier for the review"
+            tests:
+              - not_null
+              - unique
+          - name: asin
+            description: "Amazon Standard Identification Number for the product"
+          - name: overall_rating
+            description: "Rating given by the reviewer (1-5 stars)"
+            tests:
+              - dbt_expectations.expect_column_values_to_be_between:
+                  min_value: 1
+                  max_value: 5
+      - name: digital_music
+        description: "Raw digital music reviews from Amazon"
+        loaded_at_field: _loaded_at
+        freshness:
+          warn_after: {count: 1, period: day}
+          error_after: {count: 2, period: day}
+        columns:
+          - name: review_id
+            description: "Unique identifier for the review"
+            tests:
+              - not_null
+              - unique
+          - name: asin
+            description: "Amazon Standard Identification Number for the product"
+          - name: overall_rating
+            description: "Rating given by the reviewer (1-5 stars)"
+            tests:
+              - dbt_expectations.expect_column_values_to_be_between:
+                  min_value: 1
+                  max_value: 5

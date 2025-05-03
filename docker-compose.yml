@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=don
+      - POSTGRES_PASSWORD=donza3im
+      - POSTGRES_DB=postgres_wearhouse
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U don"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/db_setup.sql:/docker-entrypoint-initdb.d/db_setup.sql
+    ports:
+      - "5432:5432"
+
+  airflow:
+    image: apache/airflow:2.6.3
+    restart: unless-stopped
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://don:donza3im@postgres/postgres_wearhouse
+      - AIRFLOW__CORE__FERNET_KEY=nYPU9JFgYqIRREqNBaBe_5eKISe8UnxC5MGTNrr_Ag0=
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW_CONN_POSTGRES=postgresql://don:donza3im@postgres/postgres_wearhouse
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/data:/opt/airflow/data
+      - ./dbt:/opt/airflow/dbt  # Mount your DBT project here
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: ["/bin/bash", "-c"]
+    command: >
+      "
+      until airflow db check; do
+        echo 'Waiting for database...';
+        sleep 5;
+      done;
+      pip install dbt-postgres elementary-data;
+      airflow db init;
+      airflow users create --username admin --password admin --firstname Admin --lastname User --role Admin --email admin@example.com || true;
+      airflow webserver & airflow scheduler;
+      "
+
+volumes:
+  postgres_data:
+  airflow_data:

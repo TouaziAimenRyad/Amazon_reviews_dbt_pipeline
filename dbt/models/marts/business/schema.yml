@@ -1,0 +1,37 @@
+version: 2
+
+models:
+  - name: product_analysis
+    description: "Business analysis of product reviews with key metrics and trends"
+    columns:
+      - name: product_id
+        description: "Unique product identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_products')
+              field: product_id
+      - name: positive_review_ratio
+        description: "Percentage of positive reviews (4-5 stars)"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 1
+      - name: rating_change
+        description: "Change in average rating from previous month to current month"
+
+  - name: reviewer_analysis
+    description: "Analysis of reviewer behavior and impact metrics"
+    columns:
+      - name: reviewer_id
+        description: "Unique reviewer identifier"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_reviewers')
+              field: reviewer_id
+      - name: reviewer_impact_category
+        description: "Classification of reviewer impact based on helpful votes correlation"
+        tests:
+          - accepted_values:
+              values: ['high_impact', 'medium_impact', 'low_impact']

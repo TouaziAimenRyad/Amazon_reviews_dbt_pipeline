@@ -1,0 +1,7 @@
+__pycache__
+amazon-raw
+logs
+dbt_packages
+target
+.user.yml
+edr_target
