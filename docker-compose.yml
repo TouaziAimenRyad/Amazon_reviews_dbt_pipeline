@@ -8,7 +8,7 @@ services:
       - POSTGRES_PASSWORD=donza3im
       - POSTGRES_DB=postgres_wearhouse
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U don"]
+      test: ["CMD-SHELL", "pg_isready -U don -d postgres_wearhouse"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -33,7 +33,7 @@ services:
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
       - ./airflow/data:/opt/airflow/data
-      - ./dbt:/opt/airflow/dbt  # Mount your DBT project here
+      - ./dbt:/opt/airflow/dbt  
     ports:
       - "8080:8080"
     depends_on:
