@@ -51,7 +51,7 @@ monthly_trends AS (
             AVG(overall_rating) as monthly_avg_rating
         FROM {{ ref('fact_reviews') }}
         {% if is_incremental() %}
-        WHERE review_time >= DATEADD(month, -2, CURRENT_DATE)
+        WHERE review_time >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '2 month')
         {% endif %}
         GROUP BY 1, 2
     ) monthly_data

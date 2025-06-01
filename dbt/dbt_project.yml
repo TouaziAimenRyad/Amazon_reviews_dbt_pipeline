@@ -16,6 +16,11 @@ clean-targets:
   - "target"
   - "dbt_packages"
 
+# Add this variable to control elementary data monitoring
+vars:
+  elementary:
+    full_refresh_data_monitoring: true # Set to true for full refresh or false for incremental
+
 models:
   amazon_reviews:
     staging:
@@ -32,3 +37,7 @@ models:
 seeds:
   +schema: seed_data
   +materialized: table
+
+# Add hooks for metadata logging
+on-run-end:
+  - "{{ log_dbt_metadata(results) }}" # Call our custom macro after each run
